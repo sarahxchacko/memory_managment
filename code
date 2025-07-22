@@ -1,1 +1,45 @@
-//enter code here :) 
+//to develop a simulated memory management system 
+//supports: paging, memory allocation/deallocation,
+//page replacement algorithms (FIFO/LRU,
+//virtual-to-physical address translation 
+
+
+
+//    COMPONENTS    //
+
+//physical memory simulation 
+  //should simulate a fixed-size physical memory 
+  //each frame should be capable of storing one page
+  //maintain a frame table to track free and occupied frames
+
+
+//virtual address space
+  //should simulate multiple processes, each w/its own table
+  //processes can request memory allocation in units of pages
+
+
+//page table
+  //each process maintains its own page table
+  //each page table entry (PTE) should include   
+        //valid bit, frame #, reference bit (used for LRU), modified bit
+
+
+//memory allocation 
+  //support following command: alloc<process_id><num_pages>
+
+//memory access 
+  //support following command: access<process_id><virtual_address><read/write>
+
+//page replacement algorithm 
+  //implement FIFO and LRU to handle page faults
+
+//memory deallocation
+  //support following command: free<process_id>
+
+//main 
+//allow user to use the commands^ and output data
+//end
+
+
+
+
