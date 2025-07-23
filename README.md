@@ -1,1 +1,3 @@
 # memory_managment
+
+resources: 
