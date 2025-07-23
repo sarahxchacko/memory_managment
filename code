@@ -12,6 +12,15 @@
   //each frame should be capable of storing one page
   //maintain a frame table to track free and occupied frames
 
+//************* create physical memory ***********************
+//memory_size
+//frame_size
+//page_size
+//frame table to track all free frames and occupied frames
+
+
+
+
 
 //virtual address space
   //should simulate multiple processes, each w/its own table
