@@ -5,11 +5,21 @@
 
 #include<stdio.h>
 #include<stdlib.h>
-#include<stdbool.h> 
+#include<string.h> 
+
+
+//****** different structures we'd need: *******************
+ - frame table 
+ - process table
+ - page table 
+ - replacement queues for FIFO and LRU 
+
+
+
 
 //    COMPONENTS    //
 
-//physical memory simulation 
+// 1. Physical Memory Simulation 
   //should simulate a fixed-size physical memory 
   //each frame should be capable of storing one page
   //maintain a frame table to track free and occupied frames
@@ -24,38 +34,89 @@ our memory. */
 #define frame_size (4* 1024)                      // 4 KB per frame
 #define num_of_frames (memory_size / frame_size) //256 frames
 
-//create a frame table to track all free frames and occupied frames
+// ******** crreate frame table ************ 
+
+typedef struct {
+        int is_free;            // 1 = free; 0 = used
+        char owner_pid[10];     //get the pid of the proccess using the frame
+        int page_number;        //the page # of the process
+} Frame;
+
+Frame frame_table[num_of_frames];
+
+//set all frames as free
+void initialize_memory() {
+        for (int i = 0; i < num_of_frames; i++) {
+                frame_table[i].is_free = 1;
+                strcpy(frame_table[i].owner_pid, "");
+                frame_table[i].page_number = -1;
+        }
+}
+
+/*  **************************************************************
+//uncomment to debug
+//print frame table 
+void print_frame_table() {
+        printf("\n FRAME TABLE: \n"); 
+        printf("Frame\tFree\tOwner\tPage\n");
+        for (int i = 0; i < num_of_frames; i++) {
+                printf("%d\t%d\t%s\t%d\n", 
+                i,
+                frame_table[i].is_free,
+                frame_table[i].owner_pid,
+                frame_table[i].page_number);
+        }
+}
+*/// ***************************************************************
+
+
+
+int main() {
+        initialize_memory();
+        printf("the physical memory is initialized w %d frames of %d bytes each. \n", num_of_frames, frame_size);
+
+   /* ************************************************************
+        //uncomment to test frame table 
+        //simulate allocation to the first frame to p1 page 0
+        frame_table[0].is_free = 0;
+        strcpy(frame_table[0].owner_pid, "P1");
+        frame_table[0].page_number = 0;
+
+        //print to verify 
+        print_frame_table();
+
+   */ //**********************************************************          
+
+
+
+return 0;
+}
 
 
 
 
-
-//virtual address space
+// 2. virtual address space
   //should simulate multiple processes, each w/its own table
   //processes can request memory allocation in units of pages
 
 
-//page table
+// 3. page table
   //each process maintains its own page table
   //each page table entry (PTE) should include   
         //valid bit, frame #, reference bit (used for LRU), modified bit
 
 
-//memory allocation 
+// 4. memory allocation 
   //support following command: alloc<process_id><num_pages>
 
-//memory access 
+// 5. memory access 
   //support following command: access<process_id><virtual_address><read/write>
 
-//page replacement algorithm 
+// 6. page replacement algorithm 
   //implement FIFO and LRU to handle page faults
 
-//memory deallocation
+// 7. memory deallocation
   //support following command: free<process_id>
-
-//main 
-//allow user to use the commands^ and output data
-//end
 
 
 
