@@ -3,7 +3,9 @@
 //page replacement algorithms (FIFO/LRU,
 //virtual-to-physical address translation 
 
-
+#include<stdio.h>
+#include<stdlib.h>
+#include<stdbool.h> 
 
 //    COMPONENTS    //
 
@@ -13,10 +15,16 @@
   //maintain a frame table to track free and occupied frames
 
 //************* create physical memory ***********************
-//memory_size
-//frame_size
-//page_size
-//frame table to track all free frames and occupied frames
+
+/*representing memory as arrays and constants since we're simulating memory and
+not using OS memory. using the given values in the instructions as a base for 
+our memory. */      
+
+#define memory_size (1 * 1024 * 1024)              // 1 MB in bytes
+#define frame_size (4* 1024)                      // 4 KB per frame
+#define num_of_frames (memory_size / frame_size) //256 frames
+
+//create a frame table to track all free frames and occupied frames
 
 
 
