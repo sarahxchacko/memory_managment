@@ -8,8 +8,8 @@
 #include<string.h> 
 
 
-//****** different structures we'd need: *******************
- - frame table 
+// ********* different structures we'd need: *******************
+ ✅ frame table 
  - process table
  - page table 
  - replacement queues for FIFO and LRU 
@@ -20,11 +20,8 @@
 //    COMPONENTS    //
 
 // 1. Physical Memory Simulation 
-  //should simulate a fixed-size physical memory 
-  //each frame should be capable of storing one page
-  //maintain a frame table to track free and occupied frames
 
-//************* create physical memory ***********************
+// --------------------- physical memory ------------------------------
 
 /*representing memory as arrays and constants since we're simulating memory and
 not using OS memory. using the given values in the instructions as a base for 
@@ -53,7 +50,7 @@ void initialize_memory() {
         }
 }
 
-/*  **************************************************************
+/*    ********** 
 //uncomment to debug
 //print frame table 
 void print_frame_table() {
@@ -67,15 +64,15 @@ void print_frame_table() {
                 frame_table[i].page_number);
         }
 }
-*/// ***************************************************************
+*///  **********
 
-
+// ---------------- end of physical memory -------------------------------
 
 int main() {
         initialize_memory();
         printf("the physical memory is initialized w %d frames of %d bytes each. \n", num_of_frames, frame_size);
 
-   /* ************************************************************
+   /* *********
         //uncomment to test frame table 
         //simulate allocation to the first frame to p1 page 0
         frame_table[0].is_free = 0;
@@ -85,13 +82,12 @@ int main() {
         //print to verify 
         print_frame_table();
 
-   */ //**********************************************************          
+   */ //*********  
 
 
 
 return 0;
 }
-
 
 
 
