@@ -15,7 +15,7 @@
  //✅ frame table 
  //✅ process table
  //✅ page table 
- //- replacement queues for FIFO and LRU 
+ //✅ replacement queues for FIFO and LRU 
 
 // 2. virtual address space
   //should simulate multiple processes, each w/its own table
