@@ -1,13 +1,13 @@
 # memory_managment
-Group Members: Rebecca Bakare, Sarah Chacko
+Group Members: Sarah Chacko, Rebecca Bakare
 
 Files:
-  proj2code.c = the C code
+  ---------.c = the C code
   README.txt = the readme file with all the necessary info
 
 Compilation & Running:
-  Use this compilation line: gcc -std=c99 proj2code.c -o proj2code
-  Execute the file using the line: ./proj2code
+  Use this compilation line: -------
+  Execute the file using the line: -------
 
 Resources: 
 https://www.youtube.com/watch?v=yoj064PZCsQ
