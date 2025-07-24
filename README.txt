@@ -17,3 +17,7 @@ https://studice.blogspot.com/p/include-include-main-ms-ps-nop-np.html?utm_source
 https://www.geeksforgeeks.org/operating-systems/paging-in-operating-system/
 
 https://www.youtube.com/watch?v=-Z48jM1m2kQ&ab_channel=OliveStem
+
+https://www.youtube.com/watch?v=0OcmaLP-tT8&ab_channel=drJonasBirch
+
+https://courses.grainger.illinois.edu/cs240/sp2021/notes/virtualMemory-heap-stack.html
