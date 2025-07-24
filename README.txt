@@ -1,4 +1,3 @@
-# memory_managment
 Group Members: Sarah Chacko, Rebecca Bakare
 
 Files:
@@ -16,3 +15,5 @@ https://studice.blogspot.com/p/include-include-main-ms-ps-nop-np.html?utm_source
  ^ has some resources at the bottom
 
 https://www.geeksforgeeks.org/operating-systems/paging-in-operating-system/
+
+https://www.youtube.com/watch?v=-Z48jM1m2kQ&ab_channel=OliveStem
