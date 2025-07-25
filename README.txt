@@ -16,6 +16,8 @@ https://studice.blogspot.com/p/include-include-main-ms-ps-nop-np.html?utm_source
 
 https://www.geeksforgeeks.org/operating-systems/paging-in-operating-system/
 
+https://www.geeksforgeeks.org/dsa/program-page-replacement-algorithms-set-2-fifo/
+
 https://www.youtube.com/watch?v=-Z48jM1m2kQ&ab_channel=OliveStem
 
 https://www.youtube.com/watch?v=XGxFhz8ZbtA&ab_channel=DilipkumarGangwar
