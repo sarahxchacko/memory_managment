@@ -11,30 +11,6 @@
 #define MAX_PROCESSES 10
 #define MAX_PAGES_PER_PROCESS 64
 
-// ********* different structures we'd need: *******************
- //✅ frame table 
- //✅ process table
- //✅ page table 
- //✅ replacement queues for FIFO and LRU 
-
-// 2. virtual address space
-  //should simulate multiple processes, each w/its own table
-  //processes can request memory allocation in units of pages
-
-
-// 4. memory allocation 
-  //support following command: alloc<process_id><num_pages>
-
-// 5. memory access 
-  //support following command: access<process_id><virtual_address><read/write>
-
-// 6. page replacement algorithm ✅
-  //implement FIFO and LRU to handle page faults
-
-
-// 7. memory deallocation 
-  //support following command: free<process_id>
-
 
 //////////////////struct for entering into our page table/////////////
 typedef struct {
@@ -85,9 +61,6 @@ int availableFrames(int num_pages, int *frames);
 int pageReplacement(ProcessTable *p, int page_num);
 ProcessTable *processExists(const char *pid);
 
-//    COMPONENTS    //
-
-// 1. Physical Memory Simulation 
 
 // --------------------- physical memory ------------------------------
 
@@ -326,4 +299,25 @@ int main() {
 
 return 0;
 }
+
+
+
+
+
+
+
+
+
+// ********* different structures we'd need: *******************
+ //✅ frame table 
+ //✅ process table
+ //✅ page table 
+ //✅ replacement queues for FIFO and LRU 
+
+// 1. physical memory simulation ✅
+// 2. virtual address space
+// 4. memory allocation 
+// 5. memory access 
+// 6. page replacement algorithm ✅
+// 7. memory deallocation 
 
