@@ -22,17 +22,17 @@
   //processes can request memory allocation in units of pages
 
 
-// 4. memory allocation 
+// 4. memory allocation ✅
   //support following command: alloc<process_id><num_pages>
 
-// 5. memory access 
+// 5. memory access ✅
   //support following command: access<process_id><virtual_address><read/write>
 
-// 6. page replacement algorithm 
+// 6. page replacement algorithm ✅
   //implement FIFO and LRU to handle page faults
 
 
-// 7. memory deallocation
+// 7. memory deallocation ✅
   //support following command: free<process_id>
 
 
