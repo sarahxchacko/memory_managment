@@ -1,0 +1,334 @@
+//to simulate a memory management system
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+//------------------Constants----------------------------
+#define MAX_PROCESSES 10
+#define MAX_PAGES_PER_PROCESS 64
+#define memory_size (1 * 1024 * 1024)              // 1 MB in bytes
+#define frame_size (4* 1024)                      // 4 KB per frame
+#define num_of_frames (memory_size / frame_size) //256 frames
+
+//---------------------the structures -----------------------------
+
+///////////////////// page table ///////////////////////
+typedef struct {
+    int hit; //0 =invalid & 1=valid
+
+    //the frame number
+    int frame;
+
+    //LRU reference
+    int bitRef;
+    int changedBit;
+
+} inputToPageTable;
+
+
+/////////////////// Process Table ///////////////
+typedef struct {
+    //process ID
+    char pid[10];
+
+    //pointer to page table
+    inputToPageTable *pageTable;
+    int sizeOfPageTable;
+
+    //pointer for LRU algo
+    int *lruCount;
+
+    //start of FIFO queue
+    int fifoQueueStart;
+    //pointer for fifo algo
+    int *queueForFifo;
+
+} ProcessTable;
+
+///////////////// Frame Table ////////////////////
+
+typedef struct {
+        int is_free;            // 1 = free; 0 = used
+        char owner_pid[10];     //get the pid of the proccess using the frame
+        int page_number;        //the page # of the process
+} Frame;
+
+
+//-----------------------Global variables--------------------------
+ProcessTable processes[MAX_PROCESSES];
+int numOfProcesses = 0;
+Frame frame_table[num_of_frames];
+//replacement algorithm toggle. We'll change this variable to switch btwn algos
+//lru = 1 & fifo =0
+int algorithm = 0;
+
+
+
+
+//-----------------------list of functions-------------------------
+//declare functions
+void initialize_memory();
+void newProcess(ProcessTable *p, const char *pid);
+int memoryAlloc(const char *pid, int num_pages);
+void memoryAccess(const char *pid, int virtual_address, char *mode);
+void freeProcess(const char *pid);
+int availableFrames(int num_pages, int *frames);
+int pageReplacement(ProcessTable *p, int page_num);
+ProcessTable *processExists(const char *pid);
+
+
+
+// ---------------- THE COMPONENTS -------------------------------------
+
+////////////// physical memory /////////////
+
+void initialize_memory() {
+        for (int i = 0; i < num_of_frames; i++) {
+                frame_table[i].is_free = 1;
+                strcpy(frame_table[i].owner_pid, "");
+                frame_table[i].page_number = -1;
+        }
+        numOfProcesses = 0;
+        printf("Physcial memory is initialized with %d frames of %d bytes each.\n", num_of_frames, frame_size);
+}
+
+/////////////// process creation /////////////////
+void newProcess(ProcessTable *p, const char *pid) {
+    //copy pid string to process struct
+    strcpy(p->pid, pid);
+    p->sizeOfPageTable = MAX_PAGES_PER_PROCESS;
+    p->pageTable = (inputToPageTable *)malloc(p->sizeOfPageTable * sizeof(inputToPageTable));
+
+    //page table input initialization
+    for (int i = 0; i < p->sizeOfPageTable; i++) {
+        //bit reference for LRU set to 0
+        p->pageTable[i].bitRef = 0;
+
+        //no bits changed yet
+        p->pageTable[i].changedBit = 0;
+
+        //no table hits yet
+        p->pageTable[i].hit = 0;
+        //no frame yet
+        p->pageTable[i].frame = -1;
+    }
+
+    //fifo queue declared & initialized
+    p->queueForFifo = (int *)malloc(p->sizeOfPageTable * sizeof(int));
+    p->fifoQueueStart = 0;
+
+    //lru count for the process is set
+    p->lruCount = (int *)malloc(p->sizeOfPageTable * sizeof(int));
+    for (int i = 0; i < p->sizeOfPageTable; i++) {
+        p->lruCount[i] = 0;
+    }
+}
+
+
+///////  Validate process ///////
+//function look for pid
+ProcessTable *processExists(const char *pid) {
+    //iterate through list of processes and check if given pid exists in our list
+    for (int i = 0; i < numOfProcesses; i++) {
+        if (strcmp(processes[i].pid, pid) == 0) {
+            return &processes[i];
+        }
+    }
+    return NULL;
+}
+
+////// find available frames ////////
+int availableFrames(int num_pages, int *frames) {
+    //set frames found to 0 initially
+    int available = 0;
+
+    for (int i = 0; i < num_of_frames && available < num_pages; i++) {
+
+        //if a frame is available, set freame pointer & increment count
+        if (frame_table[i].is_free) {
+            frames[available] = i;
+            available++;
+        }
+    }
+    return (available == num_pages);
+}
+
+
+
+//----------------Memory allocation--------------------------------------
+
+int memoryAlloc(const char *pid, int num_pages){
+    // Check if process already exists
+    ProcessTable *proc = processExists(pid);
+    if (proc != NULL) {
+        printf("Process %s already has memory allocated.\n", pid);
+        return 0;
+    }
+
+    // Ensure we have enough free frames
+    int frames_needed[num_pages];  // temporary array to hold frame indices
+    if (!availableFrames(num_pages, frames_needed)) {
+        printf("Not enough free memory to allocate %d pages to %s\n", num_pages, pid);
+        return 0;
+    }
+
+    // Create a new process
+    if (numOfProcesses >= MAX_PROCESSES) {
+        printf("Process table is full, cannot allocate new process.\n");
+        return 0;
+    }
+
+    ProcessTable *newProc = &processes[numOfProcesses++];
+    newProcess(newProc, pid);
+
+    // Assign frames and update page table
+    for (int i = 0; i < num_pages; i++) {
+        int frame_index = frames_needed[i];
+
+        // Mark frame as occupied
+        frame_table[frame_index].is_free = 0;
+        strcpy(frame_table[frame_index].owner_pid, pid);
+        frame_table[frame_index].page_number = i;
+
+        // Update page table entry
+        newProc->pageTable[i].hit = 1;          // valid
+        newProc->pageTable[i].frame = frame_index;
+        newProc->pageTable[i].bitRef = 0;
+        newProc->pageTable[i].changedBit = 0;
+
+        // Add to FIFO queue
+        newProc->queueForFifo[i] = i;
+    }
+
+    newProc->sizeOfPageTable = num_pages;
+  printf("Allocated %d pages to process %s\n", num_pages, pid);
+    return 1;
+}
+
+//-------------------Accessing Memory------------------------------------
+//fill later
+
+
+
+
+// ---------------Page replacement algos --------------------------------
+//table miss -->replace a page
+int pageReplacement(ProcessTable *p, int page_num) {
+    //iterate to look for an available frame
+    for (int i = 0; i < num_of_frames; i++) {
+        if (frame_table[i].is_free) {
+            //Use free frame
+            p->pageTable[page_num].hit = 1;
+            p->pageTable[page_num].frame = i;
+            p->pageTable[page_num].bitRef = 1;
+            p->pageTable[page_num].changedBit = 0;
+
+            //set frame to 0 bc it's not free anymore
+            frame_table[i].is_free = 0;
+            strcpy(frame_table[i].owner_pid, p->pid);
+            frame_table[i].page_number = page_num;
+
+            //queue updated
+            p->queueForFifo[p->fifoQueueStart] = page_num;
+            p->fifoQueueStart = (p->fifoQueueStart + 1) % p->sizeOfPageTable;
+
+            //successfully replaced, so return 1
+            return 1;
+        }
+    }
+//victim var is the page we're replacing
+    int victim;
+
+    //fifo & lru algos
+    switch (algorithm) {
+        //fifo algo
+        case 0:
+            //victim is head of fifo queue
+            victim = p->queueForFifo[p->fifoQueueStart];
+            //append new page to queue
+            p->queueForFifo[p->fifoQueueStart] = page_num;
+
+            //queue start is moved
+            p->fifoQueueStart = (p->fifoQueueStart + 1) % p->sizeOfPageTable;
+            break;
+
+        //lru algo
+        case 1:
+        {
+            //lru counter initialized
+            int counterMax = -1;
+
+            // Find the page with the highest counter (least recently used)
+            for (int i = 0; i < p->sizeOfPageTable; i++) {
+                //if we have a table hit and the counter is greater than -1
+                if (counterMax < p->lruCount[i] &&p->pageTable[i].hit) {
+                    counterMax = p->lruCount[i];
+                    //victim update
+                    victim = i;
+                }
+            }
+            break;
+        }
+
+        default:
+            // Handle unexpected algorithm values (optional error case)
+            fprintf(stderr, "Error: Set the replacement algorithm to 0 for FIFO or 1 for LRU\n");
+            //victim is zero by default
+            victim = 0;
+            break;
+    }
+    /////////////////////////////end of algo switch
+
+//write victim
+    if (p->pageTable[victim].changedBit) {
+        printf("Writing page %d to disk\n", victim);
+    }
+
+    //frame of victim
+    int frame_num = p->pageTable[victim].frame;
+
+    //replace victim page
+    p->pageTable[victim].hit = 0;
+    p->pageTable[page_num].hit = 1;
+    p->pageTable[page_num].frame = frame_num;
+    p->pageTable[page_num].bitRef = 1;
+    p->pageTable[page_num].changedBit = 0;
+
+    //frame table update
+    strcpy(frame_table[frame_num].owner_pid, p->pid);
+    frame_table[frame_num].page_number = page_num;
+
+    return 1;
+}
+
+
+//----------------------Free Process Memory-------------------
+void freeProcess(const char *pid) {
+//fill in later
+}
+
+
+
+
+
+
+// ---------------- Main memory ------------------------------------------
+
+int main() {
+        initialize_memory();
+        printf("the physical memory is initialized w %d frames of %d bytes each. \n", num_of_frames, frame_size);
+
+
+
+
+return 0;
+}
+
+
+
+
+
+
+
+
+
