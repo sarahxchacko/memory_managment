@@ -1,3 +1,16 @@
 Input: 
+alloc P1 5
+alloc P2 3
+access P1 8192 read
+P1 12288 write
+P2 4096 read
+free P1
+
 
 Output:
+Allocated 5 pages to process P1
+Allocated 3 pages to process P2
+Translated virtual address 8192 (P1) -> physical address 8192
+Translated virtual address 12288 (P1) -> physical address 12288
+Translated virtual address 4096 (P2) -> physical address 24576
+Freed memory for process P1
