@@ -89,7 +89,7 @@ void initialize_memory() {
                 frame_table[i].page_number = -1;
         }
         numOfProcesses = 0;
-        printf("Physcial memory is initialized with %d frames of %d bytes each.\n", num_of_frames, frame_size);
+        printf("The physical memory is initialized w %d frames of %d bytes each. \n", num_of_frames, frame_size);
 }
 
 /////////////// process creation /////////////////
@@ -389,7 +389,6 @@ void freeProcess(const char *pid) {
 
 int main() {
         initialize_memory();
-        printf("the physical memory is initialized w %d frames of %d bytes each. \n", num_of_frames, frame_size);
 
 char command[50];
     while (1) {
