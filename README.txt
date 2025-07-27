@@ -11,9 +11,6 @@ Compilation & Running:
 Resources: 
 https://www.youtube.com/watch?v=yoj064PZCsQ
 
-https://studice.blogspot.com/p/include-include-main-ms-ps-nop-np.html?utm_source=chatgpt.com
- ^ has some resources at the bottom
-
 https://www.geeksforgeeks.org/operating-systems/paging-in-operating-system/
 
 https://www.geeksforgeeks.org/dsa/program-page-replacement-algorithms-set-2-fifo/
