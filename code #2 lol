@@ -206,9 +206,53 @@ int memoryAlloc(const char *pid, int num_pages){
 }
 
 //-------------------Accessing Memory------------------------------------
-//fill later
+void memoryAccess(const char *pid, int virtual_address, char *mode) {
+    // find the process
+    ProcessTable *proc = processExists(pid);
+    if (proc == NULL) {
+        printf("Process %s not found.\n", pid);
+        return;
+    }
 
+    // calculate page number and offset
+    int page_number = virtual_address / frame_size;
+    int offset = virtual_address % frame_size;
 
+    // Validate that page_number is within allocated range
+    if (page_number >= proc->sizeOfPageTable) {
+        printf("Invalid virtual address %d for process %s\n", virtual_address, pid);
+        return;
+    }
+
+    // check if the page is present in memory
+    if (proc->pageTable[page_number].hit) {
+        // Page hit
+        int frame_number = proc->pageTable[page_number].frame;
+        int physical_address = frame_number * frame_size + offset;
+
+        // Update reference and modified bits
+        proc->pageTable[page_number].bitRef = 1;  // for LRU
+        if (strcmp(mode, "write") == 0) {
+            proc->pageTable[page_number].changedBit = 1;
+        }
+
+        printf("Translated virtual address %d (%s) -> physical address %d\n",
+               virtual_address, pid, physical_address);
+    } else {
+        // the page fault
+        printf("Page fault for process %s at address %d\n", pid, virtual_address);
+
+        // Try to bring the page into memory using the replacement algorithm
+        if (pageReplacement(proc, page_number)) {
+            printf("Handled page fault: loaded page %d into memory for process %s\n",
+                   page_number, pid);
+            // Access again now that the page is in memory
+            memoryAccess(pid, virtual_address, mode);
+        } else {
+            printf("Failed to handle page fault for process %s\n", pid);
+        }
+    }
+}
 
 
 // ---------------Page replacement algos --------------------------------
@@ -304,11 +348,40 @@ int pageReplacement(ProcessTable *p, int page_num) {
 
 //----------------------Free Process Memory-------------------
 void freeProcess(const char *pid) {
-//fill in later
+    // Find the process
+    ProcessTable *proc = processExists(pid);
+    if (proc == NULL) {
+        printf("Process %s not found.\n", pid);
+        return;
+    }
+
+    // Free all frames used by this process
+    for (int i = 0; i < proc->sizeOfPageTable; i++) {
+        if (proc->pageTable[i].hit) {  // if the page is valid
+            int frame = proc->pageTable[i].frame;
+            frame_table[frame].is_free = 1;
+            strcpy(frame_table[frame].owner_pid, "");
+            frame_table[frame].page_number = -1;
+
+            proc->pageTable[i].hit = 0; // mark page invalid
+            proc->pageTable[i].frame = -1;
+        }
+    }
+
+    // Free the process’s dynamically allocated memory
+    free(proc->pageTable);
+    free(proc->lruCount);
+    free(proc->queueForFifo);
+
+    // Remove the process from the process table
+    int index = proc - processes; // find index of this process
+    for (int i = index; i < numOfProcesses - 1; i++) {
+        processes[i] = processes[i + 1];  // shift left
+    }
+    numOfProcesses--;
+
+    printf("Freed memory for process %s\n", pid);
 }
-
-
-
 
 
 
@@ -318,10 +391,37 @@ int main() {
         initialize_memory();
         printf("the physical memory is initialized w %d frames of %d bytes each. \n", num_of_frames, frame_size);
 
+char command[50];
+    while (1) {
+        printf("Enter commands alloc, access, free, or exit: ");
+        if (!fgets(command, sizeof(command), stdin))
+            break; 
+
+        char cmd[10], pid[10], mode[10];
+        int num;
+
+        if (sscanf(command, "alloc %s %d", pid, &num) == 2) {
+            memoryAlloc(pid, num);
+        }
+        else if (sscanf(command, "access %s %d %s", pid, &num, mode) == 3) {
+            memoryAccess(pid, num, mode);
+        }
+        else if (sscanf(command, "free %s", pid) == 1) {
+            freeProcess(pid);
+        }
+        else if (strncmp(command, "exit", 4) == 0) {
+            break;
+        }
+        else {
+            printf("Unknown command. Try: alloc, access, free, or exit.\n");
+        }
+    }
+
 
 
 
 return 0;
+
 }
 
 
