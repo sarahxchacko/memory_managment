@@ -1,12 +1,12 @@
 Group Members: Sarah Chacko, Rebecca Bakare
 
 Files:
-  ---------.c = the C code
+proj3.c = the C code
   README.txt = the readme file with all the necessary info
 
 Compilation & Running:
-  Use this compilation line: -------
-  Execute the file using the line: -------
+  Use this compilation line: gcc -std=c99 proj3.c -o proj3
+  Execute the file using the line: ./proj3
 
 Resources: 
 https://www.youtube.com/watch?v=yoj064PZCsQ
